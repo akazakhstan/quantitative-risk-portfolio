@@ -109,4 +109,4 @@ def calculate_monthly_payment(
         )
     )
 
-    return round(payment, 2)
+    return payment

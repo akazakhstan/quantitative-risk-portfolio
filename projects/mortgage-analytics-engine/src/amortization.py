@@ -116,7 +116,7 @@ def generate_amortization_schedule(
     if loan_term_years <= 0:
         raise ValueError("Loan term must be greater than zero.")
 
-    # Calculate the fixed monthly mortgage payment.
+# Calculate the fixed monthly mortgage payment.
     payment = calculate_monthly_payment(
         principal,
         annual_interest_rate,
@@ -139,7 +139,7 @@ def generate_amortization_schedule(
     # Total number of monthly payments.
     number_of_payments = loan_term_years * MONTHS_PER_YEAR
 
-    # Compute payment details for each month until the loan is fully repaid.
+       # Compute payment details for each month until the loan is fully repaid.
     for payment_number in range(1, number_of_payments + 1):
 
         # Monthly interest accrued on the outstanding balance.
@@ -158,10 +158,10 @@ def generate_amortization_schedule(
         schedule.append(
             {
                 "payment_number": payment_number,
-                "payment": round(payment, 2),
-                "principal": round(principal_payment, 2),
-                "interest": round(interest_payment, 2),
-                "balance": round(balance, 2),
+                "payment": payment,
+                "principal": principal_payment,
+                "interest": interest_payment,
+                "balance": balance,
             }
         )
 
