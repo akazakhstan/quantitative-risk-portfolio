@@ -166,16 +166,3 @@ def generate_amortization_schedule(
         )
 
     return schedule
-
-
-if __name__ == "__main__":
-    schedule = generate_amortization_schedule(
-        principal=300_000,
-        annual_interest_rate=6.5,
-        loan_term_years=30,
-    )
-
-    print("First five payments:\n")
-
-    for payment in schedule[:5]:
-        print(payment)

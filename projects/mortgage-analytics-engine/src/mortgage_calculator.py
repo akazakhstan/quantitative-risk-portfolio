@@ -110,13 +110,3 @@ def calculate_monthly_payment(
     )
 
     return round(payment, 2)
-
-
-if __name__ == "__main__":
-    payment = calculate_monthly_payment(
-        principal=300_000,
-        annual_interest_rate=6.5,
-        loan_term_years=30,
-    )
-
-    print(f"Monthly Payment: ${payment:,.2f}")

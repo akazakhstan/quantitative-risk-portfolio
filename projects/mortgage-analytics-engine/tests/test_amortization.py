@@ -1,181 +1,87 @@
 """
-Amortization Schedule Generator
-
-Generate a complete amortization schedule for a fixed-rate mortgage.
-
-This module provides functionality for generating a month-by-month
-amortization schedule for fixed-rate residential loans.
-
-Author: Mukhtarbek Abdurazakov
+Unit tests for the amortization schedule generator.
 """
 
-from typing import Final
+import sys
+import unittest
+from pathlib import Path
 
-from mortgage_calculator import calculate_monthly_payment
+# Allow importing modules from the src directory.
+sys.path.append(
+    str(Path(__file__).resolve().parents[1] / "src")
+)
 
-MONTHS_PER_YEAR: Final[int] = 12
-PERCENT_TO_DECIMAL: Final[float] = 100.0
+from amortization import generate_amortization_schedule
 
 
-def generate_amortization_schedule(
-    principal: float,
-    annual_interest_rate: float,
-    loan_term_years: int,
-) -> list[dict]:
-    """
-    Generate a complete amortization schedule for a fixed-rate mortgage.
+class TestAmortizationSchedule(unittest.TestCase):
+    """Tests for generate_amortization_schedule()."""
 
-    The amortization schedule shows how each monthly payment is allocated
-    between interest and principal over the life of the loan.
-
-    Mathematical Background
-    -----------------------
-    For each payment period:
-
-        Interest Payment = Remaining Balance × Monthly Interest Rate
-
-        Principal Payment = Monthly Payment − Interest Payment
-
-        Remaining Balance = Previous Balance − Principal Payment
-
-    where
-
-        Monthly Interest Rate = Annual Interest Rate / (100 × 12)
-
-    These calculations are repeated until the loan balance reaches zero.
-
-    Parameters
-    ----------
-    principal : float
-        Original loan amount.
-
-    annual_interest_rate : float
-        Annual interest rate expressed as a percentage
-        (e.g., 6.5 for 6.5%).
-
-    loan_term_years : int
-        Loan duration in years.
-
-    Returns
-    -------
-    list[dict]
-        A list containing one dictionary for each payment period.
-
-        Each dictionary contains:
-
-        - payment_number
-        - payment
-        - principal
-        - interest
-        - balance
-
-    Notes
-    -----
-    Assumptions
-    -----------
-    - Fixed interest rate
-    - Monthly compounding
-    - Fully amortizing loan
-    - Equal monthly payments
-    - No taxes or insurance
-    - No private mortgage insurance (PMI)
-    - No additional principal payments
-
-    Raises
-    ------
-    ValueError
-        If principal is less than or equal to zero.
-        If interest rate is negative.
-        If loan term is less than or equal to zero.
-
-    Example
-    -------
-    >>> schedule = generate_amortization_schedule(
-    ...     principal=300_000,
-    ...     annual_interest_rate=6.5,
-    ...     loan_term_years=30,
-    ... )
-
-    >>> schedule[0]
-
-    {
-        "payment_number": 1,
-        "payment": 1896.20,
-        "principal": 271.20,
-        "interest": 1625.00,
-        "balance": 299728.80,
-    }
-    """
-
-    if principal <= 0:
-        raise ValueError("Principal must be greater than zero.")
-
-    if annual_interest_rate < 0:
-        raise ValueError("Annual interest rate cannot be negative.")
-
-    if loan_term_years <= 0:
-        raise ValueError("Loan term must be greater than zero.")
-
-    # Calculate the fixed monthly mortgage payment.
-    payment = calculate_monthly_payment(
-        principal,
-        annual_interest_rate,
-        loan_term_years,
-    )
-
-    # Convert annual interest rate to a monthly decimal rate.
-    monthly_rate = (
-        annual_interest_rate
-        / PERCENT_TO_DECIMAL
-        / MONTHS_PER_YEAR
-    )
-
-    # Initialize the remaining loan balance.
-    balance = principal
-
-    # Store the complete amortization schedule.
-    schedule = []
-
-    # Total number of monthly payments.
-    number_of_payments = loan_term_years * MONTHS_PER_YEAR
-
-    # Compute payment details for each month until the loan is fully repaid.
-    for payment_number in range(1, number_of_payments + 1):
-
-        # Monthly interest accrued on the outstanding balance.
-        interest_payment = balance * monthly_rate
-
-        # Portion of the payment applied to principal.
-        principal_payment = payment - interest_payment
-
-        # Update the remaining loan balance.
-        balance -= principal_payment
-
-        # Prevent tiny negative balances caused by floating-point rounding.
-        if balance < 0:
-            balance = 0.0
-
-        schedule.append(
-            {
-                "payment_number": payment_number,
-                "payment": round(payment, 2),
-                "principal": round(principal_payment, 2),
-                "interest": round(interest_payment, 2),
-                "balance": round(balance, 2),
-            }
+    def test_schedule_length(self):
+        """A 30-year mortgage should produce 360 monthly payments."""
+        schedule = generate_amortization_schedule(
+            principal=300_000,
+            annual_interest_rate=6.5,
+            loan_term_years=30,
         )
 
-    return schedule
+        self.assertEqual(len(schedule), 360)
+
+    def test_first_payment(self):
+        """Verify the values of the first payment."""
+        schedule = generate_amortization_schedule(
+            principal=300_000,
+            annual_interest_rate=6.5,
+            loan_term_years=30,
+        )
+
+        first = schedule[0]
+
+        self.assertEqual(first["payment_number"], 1)
+        self.assertAlmostEqual(first["payment"], 1896.20, places=2)
+        self.assertAlmostEqual(first["principal"], 271.20, places=2)
+        self.assertAlmostEqual(first["interest"], 1625.00, places=2)
+        self.assertAlmostEqual(first["balance"], 299728.80, places=2)
+
+    def test_last_payment_balance(self):
+        """The final balance should be zero (within rounding tolerance)."""
+        schedule = generate_amortization_schedule(
+            principal=300_000,
+            annual_interest_rate=6.5,
+            loan_term_years=30,
+        )
+
+        last = schedule[-1]
+
+        self.assertAlmostEqual(last["balance"], 0.00, places=2)
+
+    def test_invalid_principal(self):
+        """Principal must be greater than zero."""
+        with self.assertRaises(ValueError):
+            generate_amortization_schedule(
+                principal=0,
+                annual_interest_rate=6.5,
+                loan_term_years=30,
+            )
+
+    def test_negative_interest_rate(self):
+        """Interest rate cannot be negative."""
+        with self.assertRaises(ValueError):
+            generate_amortization_schedule(
+                principal=300_000,
+                annual_interest_rate=-1.0,
+                loan_term_years=30,
+            )
+
+    def test_invalid_loan_term(self):
+        """Loan term must be greater than zero."""
+        with self.assertRaises(ValueError):
+            generate_amortization_schedule(
+                principal=300_000,
+                annual_interest_rate=6.5,
+                loan_term_years=0,
+            )
 
 
 if __name__ == "__main__":
-    schedule = generate_amortization_schedule(
-        principal=300_000,
-        annual_interest_rate=6.5,
-        loan_term_years=30,
-    )
-
-    print("First five payments:\n")
-
-    for payment in schedule[:5]:
-        print(payment)
+    unittest.main()
