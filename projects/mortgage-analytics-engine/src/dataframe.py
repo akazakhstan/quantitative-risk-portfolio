@@ -57,6 +57,3 @@ if __name__ == "__main__":
     print()
 
     print(df.tail())
-
-
-print(df.to_csv("amortization_schedule.csv", index=False))
