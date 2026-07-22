@@ -110,3 +110,25 @@ def calculate_monthly_payment(
     )
 
     return payment
+
+def main() -> None:
+    principal = 300_000
+    annual_interest_rate = 6.5
+    loan_term_years = 30
+
+    monthly_payment = calculate_monthly_payment(
+        principal,
+        annual_interest_rate,
+        loan_term_years,
+    )
+
+    print("=" * 40)
+    print("Mortgage Analytics Engine")
+    print("=" * 40)
+    print(f"Principal       : ${principal:,.2f}")
+    print(f"Interest Rate   : {annual_interest_rate:.2f}%")
+    print(f"Loan Term       : {loan_term_years} years")
+    print(f"Monthly Payment : ${monthly_payment:,.2f}")
+
+if __name__ == "__main__":
+    main()
