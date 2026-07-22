@@ -62,4 +62,13 @@ def ltv_risk_category(ltv: float) -> str:
         return "High Risk"
 
     return "Very High Risk"
-print(f"Risk Category: {ltv_risk_category(ltv)}")
+if __name__ == "__main__":
+    loan = 320_000
+    value = 400_000
+
+    ltv = calculate_ltv(loan, value)
+
+    print(f"Loan Amount : ${loan:,.0f}")
+    print(f"Home Value  : ${value:,.0f}")
+    print(f"LTV Ratio   : {ltv:.2f}%")
+    print(f"Risk Category: {ltv_risk_category(ltv)}")
