@@ -11,7 +11,7 @@ Author: Mukhtarbek Abdurazakov
 
 from typing import Final
 
-from mortgage_calculator import calculate_monthly_payment
+from calculators.payment import calculate_monthly_payment
 
 MONTHS_PER_YEAR: Final[int] = 12
 PERCENT_TO_DECIMAL: Final[float] = 100.0

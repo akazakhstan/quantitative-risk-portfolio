@@ -9,9 +9,8 @@ amortization schedule.
 Author: Mukhtarbek Abdurazakov
 """
 
-from amortization import generate_amortization_schedule
-from mortgage_calculator import calculate_monthly_payment
-
+from calculators.amortization import generate_amortization_schedule
+from calculators.payment import calculate_monthly_payment
 
 def generate_loan_summary(
     principal: float,

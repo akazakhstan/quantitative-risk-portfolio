@@ -8,7 +8,7 @@ Author: Mukhtarbek Abdurazakov
 
 import pandas as pd
 
-from amortization import generate_amortization_schedule
+from calculators.amortization import generate_amortization_schedule
 
 
 def create_amortization_dataframe(
